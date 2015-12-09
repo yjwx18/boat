@@ -5,12 +5,16 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
+
+	. "../log"
 )
 
 type WorkRequest struct {
 	Name         string
-	Dalay        time.Duration
+	Delay        time.Duration
 	Matches      []MatchExpression
 	PagePattern  string
 	MinPageRange int64
@@ -26,16 +30,16 @@ func ReadConfiguration() []*WorkRequest {
 	var configs []*WorkRequest
 	relativeDir := "../configuration/"
 	files, err := ioutil.ReadDir(relativeDir)
-	check(err, "Can't find the configuration dir")
+	Check(err, "Can't find the configuration dir")
 	for _, fileinfo := range files {
 		name := fileinfo.Name()
 		if !fileinfo.IsDir() && filepath.Ext(name) == ".config" {
 			f, e := os.Open(filepath.Join(relativeDir, name))
-			check(e, "Error occured when read file :"+name)
+			Check(e, "Error occured when read file :"+name)
 			decoder := json.NewDecoder(f)
 			configuration := &WorkRequest{}
 			decodeeError := decoder.Decode(&configuration)
-			check(decodeeError, "Error when decode file :"+name)
+			Check(decodeeError, "Error when decode file :"+name)
 
 			configs = append(configs, configuration)
 		}
@@ -43,11 +47,21 @@ func ReadConfiguration() []*WorkRequest {
 	return configs
 }
 
-//local functions
-func check(e error, m string) {
+func GetUrl(wr *WorkRequest) map[string]string {
 
-	if e != nil {
-		panic(m + "\n" + e.Error())
-		os.Exit(1)
+	result := make(map[string]string)
+	//checkings
+	min := strconv.Itoa(int(wr.MinPageRange))
+	max := strconv.Itoa(int(wr.MaxPageRange))
+	if max < min {
+		panic("The max value is smaller than the min value in the configuration of " + wr.Name)
 	}
+
+	for i := wr.MinPageRange; i <= wr.MaxPageRange; i++ {
+		istring := strconv.Itoa(int(i))
+		result[istring] = strings.Replace(wr.PagePattern, "[]", istring, -1)
+		//result = append(result, element)
+	}
+
+	return result
 }
