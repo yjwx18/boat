@@ -7,18 +7,18 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	. "../log"
 )
 
 type WorkRequest struct {
-	Name         string
-	Delay        time.Duration
-	Matches      []MatchExpression
-	PagePattern  string
-	MinPageRange int64
-	MaxPageRange int64
+	Name                string
+	Delay               int
+	Matches             []MatchExpression
+	PagePattern         string
+	MinPageRange        int
+	MaxPageRange        int
+	NumberOfDownloaders int
 }
 
 type MatchExpression struct {
