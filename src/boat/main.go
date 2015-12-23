@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 	"time"
-
+	"path/filepath"
 	. "../configuration"
 	. "../download"
 )
@@ -22,8 +22,8 @@ func main() {
 	for _, s := range configs {
 
 		if WorkRequest(*s).Name == "post2u" {
-
-			dirName := "outputs\\" + WorkRequest(*s).Name + "\\" + time.Now().Format("2006-Jan-02")
+    			
+			dirName := "."+string(filepath.Separator)+"outputs"+string(filepath.Separator) + WorkRequest(*s).Name + string(filepath.Separator) + time.Now().Format("2006-Jan-02")+string(filepath.Separator)
 			os.MkdirAll(dirName, 0777)
 			workerNumber := WorkRequest(*s).NumberOfDownloaders
 			jobChan := make(chan int, workerNumber)
