@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
-	"path/filepath"
+
 	. "../configuration"
 	. "../download"
 )
@@ -22,8 +23,8 @@ func main() {
 	for _, s := range configs {
 
 		if WorkRequest(*s).Name == "post2u" {
-    			
-			dirName := "."+string(filepath.Separator)+"outputs"+string(filepath.Separator) + WorkRequest(*s).Name + string(filepath.Separator) + time.Now().Format("2006-Jan-02")+string(filepath.Separator)
+
+			dirName := "." + string(filepath.Separator) + "outputs" + string(filepath.Separator) + WorkRequest(*s).Name + string(filepath.Separator) + time.Now().Format("2006-Jan-02") + string(filepath.Separator)
 			os.MkdirAll(dirName, 0777)
 			workerNumber := WorkRequest(*s).NumberOfDownloaders
 			jobChan := make(chan int, workerNumber)
@@ -44,7 +45,7 @@ func DoJobs(url string, dirName string, i string, jobChan chan int, delay int, w
 	defer wg.Done()
 	time.Sleep(time.Second * time.Duration(delay))
 	fmt.Println(i + " started")
-	WriteFile(DownloadHTML(url), dirName+"\\"+i+".html")
+	WriteFile(DownloadHTML(url), dirName+string(filepath.Separator)+i+".html")
 	fmt.Println(i + " has been saved")
 	<-jobChan
 }
